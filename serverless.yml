@@ -1,21 +1,26 @@
 service: audio2video
 
 provider:
+  environment:
+    BUCKET_DST: ${self:custom.bucketDst}
   name: aws
   runtime: nodejs12.x
   timeout: 900
   iamRoleStatements:
   - Effect: Allow
     Action:
-      - s3:PutObject
       - s3:GetObject
-    Resource: "arn:aws:s3:::${self:custom.bucket}/*"
+    Resource: "arn:aws:s3:::${self:custom.bucketSrc}/*"
+  - Effect: Allow
+    Action:
+      - s3:PutObject
+    Resource: "arn:aws:s3:::${self:custom.bucketDst}/*"
 
 functions:
   mkvideo:
     handler: handler.mkvideo
     events:
-      - s3: ${self:custom.bucket}
+      - s3: ${self:custom.bucketSrc}
     layers:
       - {Ref: FfmpegLambdaLayer}
 
@@ -24,4 +29,12 @@ layers:
     path: layer
 
 custom:
-  bucket: audio2video-files-k6b4a
+  bucketSrc: audio2video-src
+  bucketDst: audio2video-dst
+
+resources:
+  Resources:
+    BucketDst:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketDst}

@@ -79,7 +79,7 @@ module.exports.mkvideo = async (event, context) => {
     // upload result to s3
     await s3
       .putObject({
-        Bucket: record.s3.bucket.name,
+        Bucket: process.env.BUCKET_DST,
         Key: outFileKey,
         Body: mp4File
       })
