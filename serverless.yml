@@ -20,7 +20,12 @@ functions:
   mkvideo:
     handler: handler.mkvideo
     events:
-      - s3: ${self:custom.bucketSrc}
+      - s3:
+          bucket: ${self:custom.bucketSrc}
+          event: s3:ObjectCreated:*
+          rules:
+          - prefix: uploads/
+          - suffix: .mp3
     layers:
       - {Ref: FfmpegLambdaLayer}
 
